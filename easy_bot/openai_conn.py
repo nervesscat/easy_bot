@@ -9,17 +9,17 @@ from openai.types.beta.thread import Thread
 from openai.types.beta.assistant import Assistant
 
 from .ai_cores import AICore
+from .types.easy_bot_types import FunctionSchema
 
 class OpenAICore(AICore):
     __tools: list
     __DEFAULT_INSTRUCTION = "You're a helpful assistant"
 
-    def __init__(self, instruction: str = __DEFAULT_INSTRUCTION, tools: Optional[tuple] = (), **kwargs) -> None:
+    def __init__(self, instruction: str = __DEFAULT_INSTRUCTION, tools: Optional[list[FunctionSchema]] = None, **kwargs) -> None:
       self.__client: OpenAI = OpenAI(api_key=kwargs.get('token', None))
       self.__tools = []
-      if tools is not None and tools.__len__() == 4:
-        self.set_function_calling_schema(tools[0], tools[1], tools[2], tools[3])
-
+      if tools is not None:
+        self.set_all_functions(tools)
       self.__assistant: Assistant = self.__client.beta.assistants.create(
         instructions=instruction,
         tools=self.__tools,
@@ -65,23 +65,27 @@ class OpenAICore(AICore):
 
       return event_handler.snapshot.value
     
-    def set_function_calling_schema(self, name: str, func_doc: str, params: list[tuple[str, object]], required: list[tuple[str, object]]) -> None:
+    def set_all_functions(self, funcs: list[FunctionSchema]):
+      for func in funcs:
+        self.set_function_calling_schema(func)
+    
+    def set_function_calling_schema(self, func: FunctionSchema) -> None:
       self.__tools.append({
         "type": "function",
         "function": {
-          "name": name,
-          "description": func_doc,
+          "name": func["func_name"],
+          "description": func["func_doc"],
           "strict": False,
           "parameters": {
             "type": "object",
             "properties": {
               name: {
                 'type': param_type,
-                'description': func_doc
-              } for name, param_type in params},
+                'description': func["func_doc"]
+              } for name, param_type in func["parameters"]},
               "additionalProperties": False,
-              "required": [name for name, _ in required]
-                  }
+              "required": [name for name, _ in func["required"]]
+                }
             }
         })
 
@@ -92,6 +96,7 @@ class EventHandler(AssistantEventHandler):
   __last_instance: Optional['EventHandler']
 
   def __init__(self, client: OpenAI, thread: Thread, last_instance: Optional['EventHandler'] = None,  tool_outputs: Optional[list] = None):
+    super().__init__()
     self.__client = client
     self.__thread = thread
     self.snapshot = Text(annotations=[], value='')
@@ -102,7 +107,6 @@ class EventHandler(AssistantEventHandler):
 
     if tool_outputs is None: tool_outputs = []
     self.tool_outputs = tool_outputs
-    super().__init__()
 
   @override
   def on_text_created(self, text) -> None:
@@ -113,7 +117,7 @@ class EventHandler(AssistantEventHandler):
     self.snapshot = snapshot
       
   def on_tool_call_created(self, tool_call):
-    # print(f"\nassistant > {tool_call.type}\n", flush=True)
+    print(f"\nassistant > {tool_call.type}\n", flush=True)
     ...
   
   def on_tool_call_delta(self, delta, snapshot):

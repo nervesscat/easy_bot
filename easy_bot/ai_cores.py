@@ -1,3 +1,5 @@
+from .types.easy_bot_types import FunctionSchema
+
 class AICore:
     def __init__(self, *args, **kwargs):
         pass
@@ -8,5 +10,8 @@ class AICore:
     def create_text_completion(self, task: str):
         raise NotImplemented('create_text_completion method is not implemented in AICore class')
 
-    def set_function_calling_schema(self, name: str, func_doc: str, params: list[tuple[str, object]], required: list[tuple[str, object]]):
+    def set_function_calling_schema(self, funcs: list[FunctionSchema]):
+        raise NotImplemented('set_function_calling_schema method is not implemented in AICore class')
+
+    def set_all_functions(self, func: FunctionSchema):
         raise NotImplemented('set_function_calling_schema method is not implemented in AICore class')
