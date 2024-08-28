@@ -59,16 +59,60 @@ class TestEasyBot(unittest.TestCase):
         print(response2)
         self.assertTrue(response2.__contains__('1745.5'))
 
-    def test_create_assistant_div(self):
+    def test_create_assistant_div_e(self):
+        token:str = os.getenv('OPENAI_API_KEY')
+        if token is None: return
+        bot = EasyBot(token=token, instruction='You\'re a Math expert')
+        bot.add_function(division)
+        bot.create_assistant()
+        response: str = bot.create_text_completion('How many is (9724712985643634 / 589830240253532)')
+        self.assertTrue(response.__contains__('16.'))
+
+    def test_create_assistant_div_m(self):
         token:str = os.getenv('OPENAI_API_KEY')
         if token is None: return
         bot = EasyBot(token=token, instruction='You\'re a Math expert')
         bot.add_function(division)
         bot.create_assistant()
         response: str = bot.create_text_completion('How many is (9724712985643634 / 589830240253532) / 4')
-        self.assertTrue(response.__contains__('4.'))
+        print(response)
+        self.assertTrue(response.__contains__('4.12'))
 
-    def test_create_assistant_mult(self):
+    def test_create_assistant_div_h(self):
+        token:str = os.getenv('OPENAI_API_KEY')
+        if token is None: return
+        bot = EasyBot(token=token, instruction='You\'re a Math expert')
+        bot.add_function(division)
+        bot.add_function(multiplication)
+        bot.create_assistant()
+        response: str = bot.create_text_completion('How many is (9724712985643634 / 589830240253532) / 4')
+        print(response)
+        self.assertTrue(response.__contains__('4.12'))
+
+    def test_create_assistant_mult_e(self):
+        token:str = os.getenv('OPENAI_API_KEY')
+        if token is None: return
+        bot = EasyBot(token=token, instruction='You\'re a Math expert')
+        bot.add_function(division)
+        bot.add_function(multiplication)
+
+        bot.create_assistant()
+        response: str = bot.create_text_completion('How many is 78787870001999 * 78787124006456')
+        print(response)
+        self.assertTrue(response.replace(',', '').__contains__('6207469684052029949608905544'))
+
+    def test_create_assistant_mult_m(self):
+        token:str = os.getenv('OPENAI_API_KEY')
+        if token is None: return
+        bot = EasyBot(token=token, instruction='You\'re a Math expert')
+        bot.add_function(multiplication)
+
+        bot.create_assistant()
+        response: str = bot.create_text_completion('How many is 78787870001999 * 78787124006456 * 24 * 21')
+        print(response)
+        self.assertTrue(response.replace(',', '').__contains__('3128564720762223094602888394176'))
+
+    def test_create_assistant_mult_h(self):
         token:str = os.getenv('OPENAI_API_KEY')
         if token is None: return
         bot = EasyBot(token=token, instruction='You\'re a Math expert')
@@ -78,7 +122,7 @@ class TestEasyBot(unittest.TestCase):
         bot.create_assistant()
         response: str = bot.create_text_completion('How many is 78787870001999 * 78787124006456 * 24 * 21')
         print(response)
-        self.assertTrue(response.__contains__('3957819975107765370368147124.9084'))
+        self.assertTrue(response.replace(',', '').__contains__('3128564720762223094602888394176'))
 
 if __name__ == '__main__':
     unittest.main()
