@@ -4,7 +4,7 @@ from easy_bot.easy_bot import EasyBot
 
 def sum(a: int, b: int) -> int:
     """
-    Made an sum operation an returns the result
+    This function realize a sum operation
     @a : int First operand
     @b : int Second operand
     """
@@ -123,6 +123,31 @@ class TestEasyBot(unittest.TestCase):
         response: str = bot.create_text_completion('How many is 78787870001999 * 78787124006456 * 24 * 21')
         print(response)
         self.assertTrue(response.replace(',', '').__contains__('3128564720762223094602888394176'))
+
+    def test_create_assistant_multi_m(self):
+        token:str = os.getenv('OPENAI_API_KEY')
+        if token is None: return
+        bot = EasyBot(token=token, instruction='You\'re a Math expert')
+        bot.add_function(sum)
+        bot.add_function(multiplication)
+
+        bot.create_assistant()
+        response: str = bot.create_text_completion('How many is ( 78787870001999 + 78787124006456 ) * 24')
+        print(response)
+        self.assertTrue(response.replace(',', '').__contains__('3781799856202920') or response.replace(',', '').__contains__('3.7'))
+
+    def test_create_assistant_multi_h(self):
+        token:str = os.getenv('OPENAI_API_KEY')
+        if token is None: return
+        bot = EasyBot(token=token, instruction='You\'re a Math expert')
+        bot.add_function(sum)
+        bot.add_function(division)
+        bot.add_function(multiplication)
+
+        bot.create_assistant()
+        response: str = bot.create_text_completion('How many is ( ( 78787870001999 + 78787124006456 ) * 24 * 21 ) / 2')
+        print(response)
+        self.assertTrue(response.replace(',', '').__contains__('39708898490130660') or response.replace(',', '').__contains__('3.9'))
 
 if __name__ == '__main__':
     unittest.main()
