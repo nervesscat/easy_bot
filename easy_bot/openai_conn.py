@@ -81,10 +81,10 @@ class OpenAICore(AICore):
             "properties": {
               name: {
                 'type': param_type,
-                'description': func["func_doc"]
-              } for name, param_type in func["parameters"]},
+                'description': desc
+              } for name, param_type, desc in func["parameters"]},
               "additionalProperties": False,
-              "required": [name for name, _ in func["required"]]
+              "required": [name for name in func["required"]]
                 }
             }
         })
