@@ -2,27 +2,38 @@ import unittest
 import os
 from easy_bot.easy_bot import EasyBot
 
-def sum(a: int, b: int) -> int:
+def sum(a: int, b: int) -> float:
     """
     This function realize a sum operation
-    @a : int First operand
-    @b : int Second operand
+    :param a: First operand
+    :type a: float
+    :param b: Second operand
+    :type b: float
+    :return: The sum of a and b
+    :rtype: float
     """
     return a + b
 
-def multiplication(a: int, b: int) -> int:
+def multiplication(a: float, b: float) -> float:
     """
     This function realize a multiplication operation
-    @a: int This is the first parameter
-    @b: int This is the second parameter
+    :param a: This is the first parameter
+    :type a: float
+    :param b: This is the second parameter
+    :type b: float
+    :return: Return a times b
     """
     return a * b
 
-def division(dividend: int, divisor: int) -> int:
+def division(dividend: float, divisor: float) -> float:
     """
     This function realize a division operation
-    @dividend: int This is the first parameter
-    @divisor: int This is the second parameter
+    Args:
+        dividend (float): This is the first parameter
+        divisor (float): This is the second parameter
+
+    Returns:
+        float: The quotient
     """
     return dividend / divisor
 
