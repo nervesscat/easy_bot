@@ -51,7 +51,6 @@ def subtraction(a: float, b: float) -> float:
 
 class TestTools(unittest.TestCase):
     def test_params_reST(self):
-        self.maxDiff = None
         func_info: FunctionSchema = obtain_sig(sum)
         real_func_info: FunctionSchema = {
         "func_name": "sum",
@@ -73,7 +72,6 @@ class TestTools(unittest.TestCase):
         self.assertEqual(func_info, real_func_info)
     
     def test_params_google(self):
-        self.maxDiff = None
         func_info: FunctionSchema = obtain_sig(division)
         real_func_info: FunctionSchema = {
         "func_name": "division",
@@ -95,7 +93,6 @@ class TestTools(unittest.TestCase):
         self.assertEqual(func_info, real_func_info)
 
     def test_params_mult(self):
-        self.maxDiff = None
         func_info: FunctionSchema = obtain_sig(multiplication)
         real_func_info: FunctionSchema = {
         "func_name": "multiplication",
@@ -116,7 +113,6 @@ class TestTools(unittest.TestCase):
         self.assertEqual(func_info, real_func_info)
 
     def test_params_subtraction(self):
-        self.maxDiff = None
         func_info: FunctionSchema = obtain_sig(subtraction)
         real_func_info: FunctionSchema = {
         "func_name": "subtraction",

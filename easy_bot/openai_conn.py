@@ -4,9 +4,10 @@ from typing_extensions import override
 from openai import AssistantEventHandler
 from typing import Iterable, Union, Optional, Literal
 from openai.types.beta.threads.message_content_part_param import MessageContentPartParam
-from openai.types.beta.threads import Text
+from openai.types.beta.threads import Text, Run
 from openai.types.beta.thread import Thread
 from openai.types.beta.assistant import Assistant
+from openai.types.beta import AssistantStreamEvent
 
 from .ai_cores import AICore
 from .types.easy_bot_types import FunctionSchema
@@ -16,6 +17,12 @@ class OpenAICore(AICore):
     __DEFAULT_INSTRUCTION = "You're a helpful assistant"
 
     def __init__(self, instruction: str = __DEFAULT_INSTRUCTION, tools: Optional[list[FunctionSchema]] = None, **kwargs) -> None:
+      """Subclass of AICore to create an assistant with OpenAI API
+
+      Args:
+          instruction (str, optional): The instruction that the AI will use to generate the responses. Defaults to __DEFAULT_INSTRUCTION.
+          tools (Optional[list[FunctionSchema]], optional): The tools to use in the assistant. Defaults to None.
+      """      
       self.__client: OpenAI = OpenAI(api_key=kwargs.get('token', None))
       self.__tools = []
       if tools is not None:
@@ -66,10 +73,20 @@ class OpenAICore(AICore):
       return event_handler.snapshot.value
     
     def set_all_functions(self, funcs: list[FunctionSchema]):
+      """Set all the functions to use in the assistant.
+
+      Args:
+          funcs (list[FunctionSchema]): The functions to set in the assistant
+      """      
       for func in funcs:
         self.set_function_calling_schema(func)
     
     def set_function_calling_schema(self, func: FunctionSchema) -> None:
+      """Set the function calling schema to use in the assistant, this schema is the provided by the OpenAI documentation.
+
+      Args:
+          func (FunctionSchema): The function schema to set in the assistant
+      """      
       self.__tools.append({
         "type": "function",
         "function": {
@@ -101,30 +118,17 @@ class EventHandler(AssistantEventHandler):
       self.__last_instance = self
     else:
       self.__last_instance = last_instance
-
-  @override
-  def on_text_created(self, text) -> None:
-    # print(f"\nassistant_tx > ", end="", flush=True)
-    ...
       
   @override
   def on_text_delta(self, delta, snapshot):
     self.snapshot = snapshot
-      
-  def on_tool_call_created(self, tool_call):
-    # print(f"\nassistant_to > {tool_call.type}\n", flush=True)
-    ...
-  
-  def on_tool_call_delta(self, delta, snapshot):
-    ...
 
   @override
-  def on_event(self, event):
+  def on_event(self, event: AssistantStreamEvent) -> None:
     if event.event == 'thread.run.requires_action':
-      run_id = event.data.id
-      self.handle_requires_action(event.data, run_id)
+      self.handle_requires_action(event.data)
 
-  def handle_requires_action(self, data, run_id):
+  def handle_requires_action(self, data: Run) -> None:
     from .easy_bot import EasyBot
     tool_outputs: list = []
 
@@ -143,7 +147,7 @@ class EventHandler(AssistantEventHandler):
     if len(result) == 0: return
     self.__last_instance.snapshot.value = result
 
-  def submit_tool_outputs(self, tool_outputs):
+  def submit_tool_outputs(self, tool_outputs: list) -> str:
       content = ''
       with self.__client.beta.threads.runs.submit_tool_outputs_stream(
         thread_id=self.current_run.thread_id,

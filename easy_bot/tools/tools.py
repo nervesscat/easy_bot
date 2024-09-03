@@ -6,6 +6,16 @@ from ..types.easy_bot_types import FunctionSchema, Parameters
 __all__ = ['obtain_sig']
 
 def obtain_sig(func: Callable) -> FunctionSchema:
+    """
+    Function returns a dictionary with the function's name, documentation, parameters, and required parameters.
+    This used to set the functions in the EasyBot class.
+
+    Args:
+        func (Callable): The function to obtain the signature 
+
+    Returns:
+        FunctionSchema: A dictionary with the function's name, documentation, parameters, and required parameters.
+    """
     types: dict = {
         int: 'number',
         float: 'number',
