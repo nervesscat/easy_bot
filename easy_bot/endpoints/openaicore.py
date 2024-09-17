@@ -10,13 +10,13 @@ from openai.types.beta.assistant import Assistant
 from openai.types.beta import AssistantStreamEvent
 
 from .ai_cores import AICore
-from .types.easy_bot_types import FunctionSchema
+from ..types.easy_bot_types import FunctionSchema
 
 class OpenAICore(AICore):
     __tools: list
     __DEFAULT_INSTRUCTION = "You're a helpful assistant"
 
-    def __init__(self, instruction: str = __DEFAULT_INSTRUCTION, tools: Optional[list[FunctionSchema]] = None, **kwargs) -> None:
+    def __init__(self, **kwargs) -> None:
       """Subclass of AICore to create an assistant with OpenAI API
 
       Args:
@@ -24,15 +24,19 @@ class OpenAICore(AICore):
           tools (Optional[list[FunctionSchema]], optional): The tools to use in the assistant. Defaults to None.
       """      
       self.__client: OpenAI = OpenAI(api_key=kwargs.get('token', None))
-      self.__tools = []
+      self.create_bot(**kwargs)
+      self.__thread: Thread = self.__client.beta.threads.create()
+
+    def create_bot(self, **kwargs):
+      tools: list[FunctionSchema] | None = kwargs.get("tools", None)
       if tools is not None:
         self.set_all_functions(tools)
+
       self.__assistant: Assistant = self.__client.beta.assistants.create(
-        instructions=instruction,
+        instructions=kwargs.get("instruction", self.__DEFAULT_INSTRUCTION),
         tools=self.__tools,
-        model="gpt-4o-mini",
+        model=kwargs.get("model", "gpt-4o-mini"),
       )
-      self.__thread: Thread = self.__client.beta.threads.create()
 
     def create_image_completion(self, task: str, encoded_img: bytes) -> str:
       file = self.__client.files.create(file=encoded_img, purpose="vision")
@@ -77,17 +81,18 @@ class OpenAICore(AICore):
 
       Args:
           funcs (list[FunctionSchema]): The functions to set in the assistant
-      """      
+      """
+      self.__tools = []
       for func in funcs:
-        self.set_function_calling_schema(func)
+        self.__tools.append(self.set_function_calling_schema(func))
     
-    def set_function_calling_schema(self, func: FunctionSchema) -> None:
+    def set_function_calling_schema(self, func: FunctionSchema) -> dict:
       """Set the function calling schema to use in the assistant, this schema is the provided by the OpenAI documentation.
 
       Args:
           func (FunctionSchema): The function schema to set in the assistant
       """      
-      self.__tools.append({
+      return {
         "type": "function",
         "function": {
           "name": func["func_name"],
@@ -104,7 +109,7 @@ class OpenAICore(AICore):
               "required": [name for name in func["required"]]
                 }
             }
-        })
+        }
 
 class EventHandler(AssistantEventHandler):
   snapshot: Text
@@ -129,7 +134,7 @@ class EventHandler(AssistantEventHandler):
       self.handle_requires_action(event.data)
 
   def handle_requires_action(self, data: Run) -> None:
-    from .easy_bot import EasyBot
+    from ..easy_bot import EasyBot
     tool_outputs: list = []
 
     for tool in data.required_action.submit_tool_outputs.tool_calls:

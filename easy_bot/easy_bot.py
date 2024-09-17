@@ -1,11 +1,9 @@
 from .tools.tools import obtain_sig
-from .ai_cores import AICore
-from .openai_conn import OpenAICore
+from .endpoints.ai_cores import AICore
+from .endpoints.openaicore import OpenAICore
 from typing import Type, Callable
 from .types.easy_bot_types import FunctionSchema
-
-class AssistantNotCreated(Exception):
-    pass
+from .errors.easy_bot import AssistantNotCreated
 
 class EasyBot:
     __token: str
@@ -57,7 +55,8 @@ class EasyBot:
         func_info: FunctionSchema = obtain_sig(func)
         self.__functions_info.append(func_info)
         EasyBot.funcs[func_info["func_name"]] = func
-        self.create_assistant()
+        if self.__ai_core is not None:
+            self.__ai_core.create_bot(tools=self.__functions_info)
 
     def create_text_completion(self, task: str) -> str:
         """Create a text completion using the AI

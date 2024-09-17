@@ -1,5 +1,5 @@
 from .easy_bot import EasyBot
-from .ai_cores import AICore
-from .openai_conn import OpenAICore
+from .endpoints.ai_cores import AICore
+from .endpoints.openaicore import OpenAICore
 
 __all__ = ['EasyBot', 'AICore', 'OpenAICore']
