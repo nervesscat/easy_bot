@@ -1,0 +1,2 @@
+class AssistantNotCreated(Exception):
+    pass

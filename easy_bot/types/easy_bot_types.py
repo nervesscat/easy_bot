@@ -1,6 +1,6 @@
 from typing import TypedDict, NamedTuple
 
-__all__ = ["FunctionSchema"]
+__all__ = ["FunctionSchema", "Parameters"]
 
 class Parameters(NamedTuple):
     name: str
