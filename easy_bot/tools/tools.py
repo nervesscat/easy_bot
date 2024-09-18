@@ -46,7 +46,7 @@ def obtain_sig(func: Callable) -> FunctionSchema:
             description_google_pattern: str = name + r' \(' + param.annotation.__name__ + r'\):.+'
             google_pattern = re.compile(description_google_pattern)
             finds = google_pattern.findall(func_doc)
-            if len(finds) == 0: finds[0] = func_doc
+            if len(finds) == 0: finds.append(func_doc)
             
         description: str = finds[0]
         param_info: Parameters = Parameters(name, types[param.annotation], description)
