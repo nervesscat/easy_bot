@@ -2,16 +2,12 @@ from setuptools import setup, find_packages
 
 setup(
     name='easybot_py',
-    version='0.0.4',
+    version='0.0.7',
     packages=find_packages(),
+    include_package_data=True,
     install_requires=[
         'openai',
     ],
-    entry_points={
-        'console_scripts': [
-            'easybot_py=easybot_py.easybot_py:main',
-        ],
-    },
     author='Enrique Madrid',
     author_email='contact@nervess.cat',
     description='A library to help and facilitate the creation of bots and AI assistants',
