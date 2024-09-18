@@ -1,4 +1,3 @@
-from typing import Literal
 import json
 from openai import OpenAI
 
@@ -56,7 +55,6 @@ class Nim(AICore):
                 func = EasyBot.funcs[name]
                 result = func(**args)
                 log_message: str = '(Function Name: ' + str(name) + '\nParameters: ' + str(args) + '\nOutput:' + str(result) + ')'
-                print(log_message)
                 self.insert_message(log_message, 'assistant')
             content = self.create_text_completion('Function Calling Waiting...', 'assistant')
 
