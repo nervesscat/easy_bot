@@ -38,22 +38,33 @@ class OpenAICore(AICore):
         model=kwargs.get("model", "gpt-4o-mini"),
       )
 
-    def create_image_completion(self, task: str, encoded_img: bytes) -> str:
-      file = self.__client.files.create(file=encoded_img, purpose="vision")
+    def create_image_completion(self, task: str, img: Union[bytes, str], detail: Literal['low', 'high'] = 'low') -> str:
+      if type(img) == bytes:
+          file = self.__client.files.create(file=img, purpose="vision")
+          image_part = {
+              "type": "image_file",
+              "image_file": {
+                  "file_id": file.id,
+                  "detail": detail,
+              },
+          }
+      else:
+          image_part = {
+              "type": "image_url",
+              "image_url": {
+                  "url": img,
+                  "detail": detail,
+              },
+          }
+
       content: Iterable[MessageContentPartParam] = [
-        {
-          "type": "text",
-          "text": task,
-        },
-        {
-          "type": "image_file",
-          "image_file": {
-            "file_id": file.id,
-            "detail": "low",
+          {
+              "type": "text",
+              "text": task,
           },
-        }
+          image_part
       ]
-    
+
       return self.__create_completion(content)
     
     def create_text_completion(self, task: str) -> str:

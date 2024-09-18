@@ -1,9 +1,9 @@
 from .tools.tools import obtain_sig
 from .endpoints.ai_cores import AICore
 from .endpoints.openaicore import OpenAICore
-from typing import Type, Callable
 from .types.easy_bot_types import FunctionSchema
 from .errors.easy_bot import AssistantNotCreated
+from typing import Type, Callable, Union, Literal
 
 class EasyBot:
     __token: str
@@ -74,12 +74,13 @@ class EasyBot:
             raise AssistantNotCreated("AI core isn't initialized")
         return self.__ai_core.create_text_completion(task)
     
-    def create_image_completion(self, task: str, encoded_img: bytes) -> str:
+    def create_image_completion(self, task: str, img: Union[bytes, str], detail: Literal['low', 'high'] = 'low') -> str:
         """Create an image completion using the AI
 
         Args:
             task (str): The task to generate the completion
-            encoded_img (bytes): The image encoded in bytes
+            img (bytes | str): The image encoded in bytes or an url
+            detail (str): Level of detail, by default this value is in low, it could be either low or high
 
         Raises:
             AssistantNotCreated: If the AI core isn't initialized
@@ -89,6 +90,6 @@ class EasyBot:
         """        
         if self.__ai_core is None:
             raise AssistantNotCreated("AI core isn't initialized")
-        return self.__ai_core.create_image_completion(task, encoded_img)
+        return self.__ai_core.create_image_completion(task, img)
 
     
