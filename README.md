@@ -1,5 +1,7 @@
 # EasyBot Library
 
+![EasyBot](https://i.ibb.co/k5TCDmj/b-NMDiaaij-Px-ZLt-LQJCHVh.png)
+
 EasyBot is a Python library designed to facilitate the creation of AI-powered bots using OpenAI's API. This library provides a simple interface to integrate various functionalities and create a customizable assistant.
 
 ## Features
