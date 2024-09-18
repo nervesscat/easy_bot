@@ -1,7 +1,6 @@
 import unittest
 import os
-from easy_bot.easy_bot import EasyBot
-from easy_bot.endpoints.nim import Nim
+from easy_bot import EasyBot, Nim
 
 def sum(a: int, b: int) -> float:
     """
