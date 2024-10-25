@@ -160,7 +160,7 @@ class TestEasyBot(unittest.TestCase):
         print(response)
         self.assertTrue(response.replace(',', '').__contains__('39708898490130660') or response.replace(',', '').__contains__('3.9'))
 
-    def test_image(self):
+    def test_image_url(self):
         token:str = os.getenv('OPENAI_API_KEY')
         if token is None: return
         bot = EasyBot(token=token, instruction='You\'re a helpful assistant')
@@ -169,9 +169,21 @@ class TestEasyBot(unittest.TestCase):
         bot.add_function(multiplication)
         bot.create_assistant(OpenAICore, model='gpt-4o-mini')
         url: str = 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/SGI-2016-South_Georgia_(Fortuna_Bay)%E2%80%93King_penguin_(Aptenodytes_patagonicus)_04.jpg/1200px-SGI-2016-South_Georgia_(Fortuna_Bay)%E2%80%93King_penguin_(Aptenodytes_patagonicus)_04.jpg'
-        response: str = bot.create_image_completion('What\'s this?', url, 'high')
+        response: str = bot.create_image_completion('What\'s this?', url, 'low')
         print(response)
         self.assertTrue(response.lower().__contains__('penguin'))
+
+    def test_image_bytes(self):
+        token:str = os.getenv('OPENAI_API_KEY')
+        if token is None: return
+        bot = EasyBot(token=token, instruction='You\'re a helpful assistant')
+        bot.add_function(sum)
+        bot.add_function(division)
+        bot.add_function(multiplication)
+        bot.create_assistant(OpenAICore, model='gpt-4o-mini')
+        with open('tests/assets/test_image_1.jpg', 'rb') as image:
+            response: str = bot.create_image_completion('What\'s this?', image, 'low')
+            self.assertTrue(response.lower().__contains__('cat') or response.lower().__contains__('kitten'))
 
 if __name__ == '__main__':
     unittest.main()

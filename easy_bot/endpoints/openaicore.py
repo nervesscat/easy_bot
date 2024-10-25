@@ -1,4 +1,5 @@
 import json
+import io
 from openai import OpenAI
 from typing_extensions import override
 from openai import AssistantEventHandler
@@ -38,8 +39,8 @@ class OpenAICore(AICore):
         model=kwargs.get("model", "gpt-4o-mini"),
       )
 
-    def create_image_completion(self, task: str, img: Union[bytes, str], detail: Literal['low', 'high'] = 'low') -> str:
-      if type(img) == bytes:
+    def create_image_completion(self, task: str, img: Union[io.BufferedReader, str], detail: Literal['low', 'high'] = 'low') -> str:
+      if type(img) == io.BufferedReader:
           file = self.__client.files.create(file=img, purpose="vision")
           image_part = {
               "type": "image_file",

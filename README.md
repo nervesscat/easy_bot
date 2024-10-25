@@ -85,10 +85,8 @@ You can pass an image to the bot, and it will generate a response based on the i
 response = client.create_image_completion('url_to_image')
 
 # Local image
-with open('image.jpg', 'rb') as f:
-    image = f.read()
-
-response = client.create_image_completion(image)
+with open('image.jpg', 'rb') as image:
+    response = client.create_image_completion('What\'s this?', image)
 ```
 
 ## Documentation
